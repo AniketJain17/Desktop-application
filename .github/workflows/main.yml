@@ -1,0 +1,26 @@
+on: [push]
+
+jobs:
+ Mains:
+   runs-on: ${{ matrix.os }}
+   strategy:
+     matrix:
+       os: [ubuntu-latest, macOS-latest, windows-latest]
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v2
+     - name: Configure JDK
+       uses: actions/setup-java@v1
+       with:
+         java-version: 11
+     - name: setup Gradle   
+       uses: gradle/gradle-build-action@v2
+       with:
+        gradle-version: release-candidate
+     - name: Change wrapper permissions
+       run: chmod +x ./gradlew   
+     - name: Publish
+       run: ./gradlew tasks
+       env:
+         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
